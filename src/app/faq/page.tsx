@@ -27,6 +27,22 @@ export default function FAQPage() {
             </p>
           </div>
 
+           <div className="rounded-xl border p-3 shadow-sm2">
+            <h2 className="font-semibold text-lg">
+              How to search on 'Quickhsn.in' ?
+            </h2>
+            <p className="mt-2 text-gray-700 text-justify">
+              Search can be done either by way of entering the product name Ex. Milk, Sugar, Cement, 
+              Samrtphone and so on,  or by way of entering the HSN code (either 4, 6 or 8 digit)
+              Ex. 22029030, 84806000 or 8480, 848060 etc., You will get the details of 4, 6 and 8 digit
+              HSN codes and Description of the product as well as GST Rate. You can copy and share the
+              HSN code through Whatsapp, Telegram etc., There is an in-built GST calculator for each 
+              8 digit HSN code. You can get the product wise sub-totals, SGST, CGST, IGST details,
+              and Invoice amount on the spot.
+              
+            </p>
+          </div>
+          
           <div className="rounded-xl border p-3 shadow-sm2">
             <h2 className="font-semibold text-lg">
               What are the different services / tools available on Quickhsn.in ?
@@ -61,7 +77,7 @@ export default function FAQPage() {
     <li>On the next page, fill up your (supplier) detais and client (purchaser) details carefully, in the respective boxes.</li>
     <li>You can add your business / company logo with the help of the "Upload Logo" button provided at the top.</li>
     <li>Put the Invoice number and date in the boxes meant for.</li>
-    <li>Enter the description of the items, HSN code, Quantity, Rate, GST rate.</li>
+    <li>Enter the Description of the items, HSN code, Quantity, Rate, Discout (if any), & GST rate.</li>
     <li>If you want you can add another line for the sold products.</li>
     <li>You will have an automated pre-view of the Invoice you have been prepared.</li>
     <li>After getting satisfied with the pre-view, you can press print button to get the print of the said invoice.</li>
@@ -133,10 +149,13 @@ export default function FAQPage() {
 
             <div className="rounded-xl border p-3 shadow-sm2">
             <h2 className="font-semibold text-lg">
-              ... 
+              What is GST? 
             </h2>
             <p className="mt-2 text-gray-700 text-justify">
-              ...
+              Goods and Services Tax (GST) is an unique tax levied by Govt. of India, on all goods purchased and services received. This is an idirect tax
+              unlike Income tax. GST is implemented under One Nation, One Tax regime policy of Indian Govt. GST replaced many regional taxes levied by the 
+              State Govt. and Central Govt. GST is a destination based tax, which means the tax is collected by the state where the goods are consumed or 
+              services are received.
             </p>
           </div>
           

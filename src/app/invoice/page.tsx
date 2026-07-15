@@ -8,6 +8,7 @@ interface InvoiceItem {
   hsn: string;
   qty: number;
   rate: number;
+  discount: number; // Added Discount field (%)
   gstRate: number;
 }
 
@@ -60,12 +61,12 @@ export default function InvoiceGenerator() {
   
   const [clientName, setClientName] = useState("");
   const [clientGstin, setClientGstin] = useState("");
-  const [clientState, setClientState] = useState("27 - Maharashtra"); // Defaulting to a high volume trade state
+  const [clientState, setClientState] = useState("27 - Maharashtra");
   const [invoiceNo, setInvoiceNo] = useState("INV-2026-001");
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { id: "1", description: "Dry Red Chillies", hsn: "0904", qty: 100, rate: 220, gstRate: 5 }
+    { id: "1", description: "Dry Red Chillies", hsn: "0904", qty: 100, rate: 220, discount: 0, gstRate: 5 }
   ]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +80,7 @@ export default function InvoiceGenerator() {
   };
 
   const addItem = () => {
-    setItems([...items, { id: Date.now().toString(), description: "", hsn: "", qty: 1, rate: 0, gstRate: 18 }]);
+    setItems([...items, { id: Date.now().toString(), description: "", hsn: "", qty: 1, rate: 0, discount: 0, gstRate: 18 }]);
   };
 
   const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
@@ -94,14 +95,22 @@ export default function InvoiceGenerator() {
   const clientStateCode = clientState.substring(0, 2);
   const isIntrastate = supplierStateCode === clientStateCode;
 
-  const subTotal = items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
+  // Calculate Subtotal (Total Taxable Value considering discount)
+  const subTotal = items.reduce((sum, item) => {
+    const gross = item.qty * item.rate;
+    const itemDiscount = gross * ((item.discount || 0) / 100);
+    return sum + (gross - itemDiscount);
+  }, 0);
   
   let totalCgst = 0;
   let totalSgst = 0;
   let totalIgst = 0;
 
   items.forEach(item => {
-    const itemTaxable = item.qty * item.rate;
+    const gross = item.qty * item.rate;
+    const itemDiscount = gross * ((item.discount || 0) / 100);
+    const itemTaxable = gross - itemDiscount;
+
     if (isIntrastate) {
       totalCgst += itemTaxable * (item.gstRate / 2 / 100);
       totalSgst += itemTaxable * (item.gstRate / 2 / 100);
@@ -165,10 +174,11 @@ export default function InvoiceGenerator() {
           <h3 className="font-semibold text-green-700">Line Items</h3>
           {items.map((item) => (
             <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 bg-gray-100 p-2 rounded items-center">
-              <input type="text" placeholder="Item Description" value={item.description} onChange={e => updateItem(item.id, "description", e.target.value)} className="md:col-span-4 p-1.5 border rounded text-sm bg-white" />
+              <input type="text" placeholder="Item Description" value={item.description} onChange={e => updateItem(item.id, "description", e.target.value)} className="md:col-span-3 p-1.5 border rounded text-sm bg-white" />
               <input type="text" placeholder="HSN" value={item.hsn} onChange={e => updateItem(item.id, "hsn", e.target.value)} className="md:col-span-2 p-1.5 border rounded text-sm bg-white" />
               <input type="number" placeholder="Qty" value={item.qty} onChange={e => updateItem(item.id, "qty", parseFloat(e.target.value) || 0)} className="md:col-span-1 p-1.5 border rounded text-sm bg-white" />
               <input type="number" placeholder="Rate" value={item.rate} onChange={e => updateItem(item.id, "rate", parseFloat(e.target.value) || 0)} className="md:col-span-2 p-1.5 border rounded text-sm bg-white" />
+              <input type="number" placeholder="Disc %" value={item.discount} onChange={e => updateItem(item.id, "discount", parseFloat(e.target.value) || 0)} className="md:col-span-1 p-1.5 border rounded text-sm bg-white" />
               <select value={item.gstRate} onChange={e => updateItem(item.id, "gstRate", parseInt(e.target.value))} className="md:col-span-2 p-1.5 border rounded text-sm bg-white">
                 <option value={0}>0% GST</option>
                 <option value={0.25}>0.25% GST</option>
@@ -232,6 +242,7 @@ export default function InvoiceGenerator() {
               <th className="py-2 text-center">HSN</th>
               <th className="py-2 text-right">Qty</th>
               <th className="py-2 text-right">Rate</th>
+              <th className="py-2 text-right">Discount</th>
               <th className="py-2 text-right">Taxable Val</th>
               <th className="py-2 text-right">GST Rate</th>
               <th className="py-2 text-right px-1">Total</th>
@@ -239,15 +250,22 @@ export default function InvoiceGenerator() {
           </thead>
           <tbody className="divide-y divide-gray-200 text-xs text-gray-700">
             {items.map((item, i) => {
-              const taxable = item.qty * item.rate;
+              const gross = item.qty * item.rate;
+              const discountVal = gross * ((item.discount || 0) / 100);
+              const taxable = gross - discountVal;
               const taxAmount = taxable * (item.gstRate / 100);
+
               return (
                 <tr key={item.id} className="align-top">
                   <td className="py-2.5 px-1">{i + 1}</td>
-                  <td className="py-2.5 font-medium">{item.description || "Unlabeled Product"}</td>
+                  {/* Clean line-wrapping for descriptions after ~40 chars without word clipping */}
+                  <td className="py-2.5 font-medium break-words whitespace-pre-wrap max-w-[200px] md:max-w-[280px]">
+                    {item.description || "Unlabeled Product"}
+                  </td>
                   <td className="py-2.5 text-center">{item.hsn || "—"}</td>
                   <td className="py-2.5 text-right">{item.qty}</td>
                   <td className="py-2.5 text-right">₹{item.rate.toFixed(2)}</td>
+                  <td className="py-2.5 text-right">{item.discount > 0 ? `${item.discount}%` : "—"}</td>
                   <td className="py-2.5 text-right">₹{taxable.toFixed(2)}</td>
                   <td className="py-2.5 text-right">{item.gstRate}%</td>
                   <td className="py-2.5 text-right px-1 font-medium">₹{(taxable + taxAmount).toFixed(2)}</td>
@@ -291,13 +309,18 @@ export default function InvoiceGenerator() {
           </div>
         </div>
 
+        {/* Invoice Footer Section */}
         <div className="mt-12 pt-8 border-t border-dashed border-gray-300 grid grid-cols-2 text-[11px] text-gray-500">
           <div>
             <h4 className="font-semibold uppercase text-gray-700 mb-1">Declaration</h4>
             <p>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.</p>
+            {/* Custom Bottom-Left Greeting */}
+            <p className="mt-4 text-emerald-700 font-semibold italic text-xs">
+              Thank you for Shopping with Us.
+            </p>
           </div>
-          <div className="text-right flex flex-col justify-between items-end h-20">
-            <p className="font-semibold text-gray-700">Authorised Signatory for {supplierName || "Company"}</p>
+          <div className="text-right flex flex-col justify-between items-end h-24">
+            <p className="font-semibold text-gray-700">Authorised Signatory</p>
             <div className="w-36 border-t border-gray-400 mt-8"></div>
           </div>
         </div>
