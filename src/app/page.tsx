@@ -1,3 +1,4 @@
+import ContactForm from "@/components/ContactForm";
 import HsnLookup from "@/app/hsn-lookup/HsnLookup";
 
 export default function Page() {
@@ -37,6 +38,7 @@ export default function Page() {
           </p>
         </div>
       </div>
+      <ContactForm />
     </main>
   );
 }
