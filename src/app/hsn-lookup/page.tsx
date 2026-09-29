@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useState } from "react";
 import { getSupabase } from "@/lib/supabase/supabase";
 import type { HSNMasterRow } from "@/lib/supabase/types";
@@ -171,7 +172,17 @@ export default function HsnLookup() {
               <div key={`${row.hsn_code}-${index}`} className="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm flex flex-col justify-between">
                 <div className="flex items-center justify-between gap-2 border-b border-gray-50 pb-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-base font-bold text-blue-700">{row.hsn_code}</span>
+                    {/* SEO Link to Dedicated Page */}
+                    <Link
+                      href={`/hsn/${row.hsn_code}`}
+                      target="_blank"
+                      className="font-mono text-base font-bold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
+                      title={`View details page for HSN ${row.hsn_code}`}
+                    >
+                      <span>{row.hsn_code}</span>
+                      <span className="text-xs text-blue-500 font-sans">&rarr;</span>
+                    </Link>
+
                     <button
                       onClick={() => handleCopy(String(row.hsn_code))}
                       className="rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-500 hover:bg-gray-100"
@@ -183,7 +194,7 @@ export default function HsnLookup() {
                     {row.gst_rate}% GST
                   </div>
                 </div>
-                {/* Fix 2: Changed text-xs to text-sm and lightened color slightly to gray-600 for clean display */}
+                
                 <div className="max-h-[100px] overflow-y-auto text-sm text-gray-600 leading-relaxed pr-1 scrollbar-thin">
                   {row.description}
                 </div>
@@ -204,7 +215,17 @@ export default function HsnLookup() {
             <div key={`${row.hsn_code}-${index}`} className="rounded-xl border-l-4 border-green-500 border border-gray-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-base md:text-lg font-bold text-green-700 tracking-wide">{row.hsn_code}</span>
+                  {/* SEO Link to Dedicated Page */}
+                  <Link
+                    href={`/hsn/${row.hsn_code}`}
+                    target="_blank"
+                    className="font-mono text-base md:text-lg font-bold text-green-700 hover:text-green-900 hover:underline tracking-wide flex items-center gap-1"
+                    title={`View details page for HSN ${row.hsn_code}`}
+                  >
+                    <span>{row.hsn_code}</span>
+                    <span className="text-xs text-green-600 font-sans">&rarr;</span>
+                  </Link>
+
                   <button
                     onClick={() => handleCopy(String(row.hsn_code))}
                     className="rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] text-gray-500 hover:bg-gray-100 transition"
@@ -304,7 +325,6 @@ export default function HsnLookup() {
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>GST ({gstRate}%):</span>
-                        {/* Fix 1: Brightened the CGST/SGST text from text-gray-400 to text-gray-700 and font-medium */}
                         <span>₹{gstAmount.toFixed(2)} <span className="text-[11px] text-gray-700 font-medium ml-1">(CGST: {cgst.toFixed(2)}, SGST: {sgst.toFixed(2)})</span></span>
                       </div>
                       <div className="border-t border-green-200/60 pt-1 flex justify-between font-bold text-gray-900 text-sm">
@@ -329,7 +349,6 @@ export default function HsnLookup() {
       {/* Quick Tools Home Panel */}
       {detailedResults.length === 0 && parentResults.length === 0 && query.trim() === "" && (
         <div className="mt-4">
-          {/* Fix 3: Changed text-sm to text-base and updated text color for prominent headings */}
           <h3 className="text-base font-bold mb-3 text-gray-800 tracking-wide">⚡ Quick Tools</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             <a href="/invoice" className="p-2.5 border rounded-lg hover:bg-gray-50 transition text-center block text-xs font-medium shadow-sm bg-white text-gray-800">📄 GST-Invoice</a>
