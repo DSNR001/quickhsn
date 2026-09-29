@@ -1,5 +1,5 @@
 import ContactForm from "@/components/ContactForm";
-import HsnLookup from "@/app/hsn-lookup/HsnLookup";
+import HsnLookup from "@/app/hsn-lookup/page";
 
 export default function Page() {
   return (
